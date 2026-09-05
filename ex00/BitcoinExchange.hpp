@@ -1,6 +1,7 @@
 #ifndef BITCOIN_EXCHANGE_H
 #define BITCOIN_EXCHANGE_H
 
+#include <exception>
 #include <iostream>
 #include <map>
 #include <string>
@@ -19,13 +20,32 @@ public:
 	BitcoinExchange& operator=(const BitcoinExchange& other);
 	~BitcoinExchange();
 
-	bool loadDatabase(const std::string& path);
-	void processFile(const std::string& path) const;
+	void loadDatabase(const std::string& path);
+	void processInput(const std::string& path) const;
 
 	// bool isValidDate(const std::string& data);
 	// bool isValidValue(const std::string& value);
 
 	// double getRate(const std::string& data);
+
+
+	class FileOpenException : public std::exception
+	{
+	public:
+		virtual const char* what() const throw();
+	};
+
+	class EmptyDatabaseException : public std::exception
+	{
+	public:
+		virtual const char* what() const throw();
+	};
+
+	class DateOutOfRangeException : public std::exception
+	{
+	public:
+		virtual const char* what() const throw();
+	};
 };
 
 #endif
