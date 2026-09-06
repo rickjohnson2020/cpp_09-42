@@ -171,7 +171,7 @@ void BitcoinExchange::loadDatabase(const std::string& path) {
 		std::string date = trimmed.substr(0, pos);
 		std::string rateStr = trimmed.substr(pos + 1);
 
-		if (isValidDateFormat(date))
+		if (!isValidDateFormat(date))
 			continue;
 
 		char* end;
