@@ -19,12 +19,14 @@ int RPN::calculate(const std::string& expr) {
 	std::istringstream iss(expr);
 	std::string token;
 
+	while (!_stack.empty())
+		_stack.pop();
 	while (iss >> token) {
 		if (isOperator(token)) {
 			if (_stack.size() < 2)
 				throw std::runtime_error("Error");
 			applyOperator(token[0]);
-		} else if (token.length() == 1 && std::isdigit(token[0])) {
+		} else if (token.length() == 1 && std::isdigit(static_cast<unsigned char>(token[0]))) {
 			_stack.push(token[0] - '0');
 		} else {
 			throw std::runtime_error("Error");
