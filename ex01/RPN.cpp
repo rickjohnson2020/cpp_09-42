@@ -43,6 +43,9 @@ bool RPN::isOperator(const std::string& token) const {
 
 void RPN::applyOperator(char op) {
 	int right = _stack.top();
+	if (op == '/' && right == 0)
+		throw std::runtime_error("Error");
+
 	_stack.pop();
 	int left = _stack.top();
 	_stack.pop();
@@ -53,9 +56,6 @@ void RPN::applyOperator(char op) {
 		_stack.push(left - right);
 	else if (op == '*')
 		_stack.push(left * right);
-	else {
-		if (right == 0)
-			throw std::runtime_error("Error");
+	else if (op == '/')
 		_stack.push(left / right);
-	}
 }
