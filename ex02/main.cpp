@@ -1,12 +1,18 @@
+#include "./PmergeMe.hpp"
+#include <exception>
 #include <iostream>
 
 
 int main(int argc, char** argv) {
-	if (argc < 1) {
-		std::cerr << "Error" << std::endl;
-		return 1;
+	try {
+		PmergeMe p;
+		p.parse(argc, argv);
+		p.printBefore();
+		p.sortVector();
+		p.printAfter();
+		p.printTimes();
+	} catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
 	}
-
-	// 7, 3, 9, 2, 5, 1
-	// 
+	return 0;
 }
