@@ -35,6 +35,7 @@ private:
 	std::deque<int> fordJohnsonDeq(const std::deque<int>& input);
 	std::deque<Pair> makeDeqPairs(const std::deque<int>& input,
 		bool& hasStraggler, int& straggler);
+	void binaryInsertDeq(std::deque<int>& chain, const Pending& p);
 
 public:
 	void parse(int ac, char** av);
@@ -47,6 +48,3 @@ public:
 
 
 #endif
-
-
-

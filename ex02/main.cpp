@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
 		p.parse(argc, argv);
 		p.printBefore();
 		p.sortVector();
+		p.sortDeque();
 		p.printAfter();
 		p.printTimes();
 	} catch (const std::exception& e) {

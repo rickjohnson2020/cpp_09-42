@@ -7,7 +7,6 @@
 #include <deque>
 #include <stdexcept>
 #include <climits>
-#include <tuple>
 #include <vector>
 
 void PmergeMe::parse(int ac, char** av) {
@@ -29,6 +28,7 @@ void PmergeMe::parse(int ac, char** av) {
 			throw std::runtime_error("Error");
 
 		_vec.push_back(static_cast<int>(v));
+		_deq.push_back(static_cast<int>(v));
 	}
 }
 
@@ -37,6 +37,13 @@ void PmergeMe::sortVector() {
 	_vec = fordJohnsonVector(_vec);
 	clock_t end = clock();
 	_vecTime = (static_cast<double>(end - start) / CLOCKS_PER_SEC) * 1000000.0;
+}
+
+void PmergeMe::sortDeque() {
+	clock_t start = clock();
+	_deq = fordJohnsonDeq(_deq);
+	clock_t end = clock();
+	_deqTime = (static_cast<double>(end - start) / CLOCKS_PER_SEC) * 1000000.0;
 }
 
 void PmergeMe::printBefore() const {
@@ -59,6 +66,8 @@ void PmergeMe::printTimes() const {
 	std::cout << "Time to process a range of " << _vec.size() <<
 			" elements with std::vector: " << _vecTime << " us" << std::endl;
 	
+	std::cout << "Time to process a range of " << _deq.size() <<
+			" elements with std::deque: " << _deqTime << " us" << std::endl;
 }
 
 bool PmergeMe::containsDuplicate(int value) const {
@@ -214,7 +223,48 @@ std::deque<int> PmergeMe::fordJohnsonDeq(const std::deque<int>& input) {
 		highs.push_back(pairs[i].high);
 	std::deque<int> sortedHighs = fordJohnsonDeq(highs);
 
-	
+	//sortedHighsの順番にpairを並べ直す
+	std::deque<Pair> reorderedPairs;
+	for (size_t i = 0; i < sortedHighs.size(); ++i) {
+		for (size_t j = 0; j < pairs.size(); ++j) {
+			if (pairs[j].high == sortedHighs[i]) {
+				reorderedPairs.push_back(pairs[j]);
+				break;
+			}
+		}
+	}
+
+	//main chainを作る(sortedHighsにreorderedPairsのhighが一番小さいペアのlowを入れる)
+	std::deque<int> mainChain = sortedHighs;
+	mainChain.insert(mainChain.begin(), reorderedPairs[0].low);
+
+	//create pending
+	std::deque<Pending> pending;
+	for (size_t i = 1; i < reorderedPairs.size(); ++i) {
+		Pending p;
+		p.value = reorderedPairs[i].low;
+		p.partner = reorderedPairs[i].high;
+		p.hasPartner = true;
+		pending.push_back(p);
+	}
+	if (hasStraggler) {
+		Pending p;
+		p.value = straggler;
+		p.partner = -1;
+		p.hasPartner = false;
+		pending.push_back(p);
+	}
+
+	//insert pending into mainChain using binary insertion
+	std::vector<size_t> insertionOrder = makeJacobsthalOrder(pending.size() + 1);
+	for (size_t i = 0; i < insertionOrder.size(); ++i) {
+		size_t aIndex = insertionOrder[i];
+		size_t pIndex = aIndex - 2;
+		Pending& p = pending[pIndex];
+		binaryInsertDeq(mainChain, p);
+	}
+
+	return mainChain;
 }
 
 std::deque<PmergeMe::Pair> PmergeMe::makeDeqPairs(const std::deque<int>& input,
@@ -237,4 +287,18 @@ std::deque<PmergeMe::Pair> PmergeMe::makeDeqPairs(const std::deque<int>& input,
 		straggler = input.back();
 	}
 	return pairs;
+}
+
+void PmergeMe::binaryInsertDeq(std::deque<int>& chain, const Pending& p) {
+	if (p.hasPartner) {
+		std::deque<int>::iterator partnerIt =
+				std::find(chain.begin(), chain.end(), p.partner);
+		std::deque<int>::iterator insertPos =
+				std::lower_bound(chain.begin(), partnerIt, p.value);
+		chain.insert(insertPos, p.value);
+	} else {
+		std::deque<int>::iterator insertPos =
+				std::lower_bound(chain.begin(), chain.end(), p.value);
+		chain.insert(insertPos, p.value);
+	}
 }
