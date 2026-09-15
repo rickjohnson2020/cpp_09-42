@@ -1,10 +1,13 @@
 #include "./PmergeMe.hpp"
 #include <algorithm>
 #include <cerrno>
+#include <cfloat>
 #include <cstddef>
 #include <ctime>
+#include <deque>
 #include <stdexcept>
 #include <climits>
+#include <tuple>
 #include <vector>
 
 void PmergeMe::parse(int ac, char** av) {
@@ -195,4 +198,43 @@ void PmergeMe::binaryInsertVec(std::vector<int>& chain, const Pending& p) {
 		
 		chain.insert(insertPos, p.value);
 	}
+}
+
+std::deque<int> PmergeMe::fordJohnsonDeq(const std::deque<int>& input) {
+	if (input.size() <= 1)
+		return input;
+
+	bool hasStraggler;
+	int straggler;
+	std::deque<Pair> pairs = makeDeqPairs(input, hasStraggler, straggler);
+
+	//highだけ取り出して再帰でソートする
+	std::deque<int> highs;
+	for (size_t i = 0; i < pairs.size(); ++i)
+		highs.push_back(pairs[i].high);
+	std::deque<int> sortedHighs = fordJohnsonDeq(highs);
+
+	
+}
+
+std::deque<PmergeMe::Pair> PmergeMe::makeDeqPairs(const std::deque<int>& input,
+		bool& hasStraggler, int& straggler) {
+	std::deque<Pair> pairs;
+	for (size_t i = 0; i + 1 < input.size(); i += 2) {
+		Pair p;
+		if (input[i] < input[i + 1]) {
+			p.low = input[i];
+			p.high = input[i + 1];
+		} else {
+			p.low = input[i + 1];
+			p.high = input[i];
+		}
+		pairs.push_back(p);
+	}
+
+	if (input.size() % 2 != 0) {
+		hasStraggler = true;
+		straggler = input.back();
+	}
+	return pairs;
 }

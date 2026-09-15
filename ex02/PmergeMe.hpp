@@ -2,6 +2,7 @@
 #define PMERGEME_H
 
 #include <cstddef>
+#include <deque>
 #include <vector>
 #include <iostream>
 
@@ -27,10 +28,18 @@ private:
 		bool& hasStraggler, int& straggler);
 	bool containsDuplicate(int value) const;
 	std::vector<size_t> makeJacobsthalOrder(size_t maxIndex);
-	
+
+	std::deque<int> _deq;
+	double _deqTime;
+
+	std::deque<int> fordJohnsonDeq(const std::deque<int>& input);
+	std::deque<Pair> makeDeqPairs(const std::deque<int>& input,
+		bool& hasStraggler, int& straggler);
+
 public:
 	void parse(int ac, char** av);
 	void sortVector();
+	void sortDeque();
 	void printBefore() const;
 	void printAfter() const;
 	void printTimes() const;

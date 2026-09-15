@@ -6,8 +6,7 @@
 #include <map>
 #include <string>
 
-class BitcoinExchange
-{
+class BitcoinExchange {
 private:
 	std::map<std::string, double> _db;
 
@@ -23,26 +22,17 @@ public:
 	void loadDatabase(const std::string& path);
 	void processInput(const std::string& path) const;
 
-	// bool isValidDate(const std::string& data);
-	// bool isValidValue(const std::string& value);
-
-	// double getRate(const std::string& data);
-
-
-	class FileOpenException : public std::exception
-	{
+	class FileOpenException : public std::exception {
 	public:
 		virtual const char* what() const throw();
 	};
 
-	class EmptyDatabaseException : public std::exception
-	{
+	class EmptyDatabaseException : public std::exception {
 	public:
 		virtual const char* what() const throw();
 	};
 
-	class DateOutOfRangeException : public std::exception
-	{
+	class DateOutOfRangeException : public std::exception {
 	public:
 		virtual const char* what() const throw();
 	};
