@@ -20,14 +20,41 @@ static ValueError parseValue(const std::string& s, double& out);
 
 BitcoinExchange::BitcoinExchange() {}
 BitcoinExchange::~BitcoinExchange() {}
-
 BitcoinExchange::BitcoinExchange(const BitcoinExchange& other) : _db(other._db) {}
-
 BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other) {
 	if (this == &other)
 		return *this;
 	_db = other._db;
 	return *this;
+}
+
+void BitcoinExchange::loadDatabase(const std::string& path) {
+	std::ifstream ifs(path.c_str());
+	if (!ifs)
+		throw FileOpenException();
+	std::string line;
+	while (std::getline(ifs, line)) {
+		std::string trimmed = trim(line);
+		if (trimmed.empty() || trimmed == "date,exchange_rate")
+			continue;
+		size_t pos = trimmed.find(',');
+		if (pos == std::string::npos)
+			continue;
+		std::string date = trimmed.substr(0, pos);
+		std::string rateStr = trimmed.substr(pos + 1);
+
+		if (!isValidDateFormat(date))
+			continue;
+
+		char* end;
+		double rate = std::strtod(rateStr.c_str(), &end);
+		if (end == rateStr.c_str() || *end != '\0')
+			continue;
+
+		_db[date] = rate;
+	}
+	if (_db.empty())
+		throw EmptyDatabaseException();
 }
 
 void BitcoinExchange::processInput(const std::string& path) const {
@@ -121,6 +148,28 @@ static bool isValidCalendarDate(int y, int m, int d) {
 	return true;
 }
 
+static int daysInMonth(int year, int month) {
+	static const int days[12] = {31, 28, 31, 30, 31, 30,
+			31, 31, 30, 31, 30, 31};
+
+	if (month == 2 && isLeapYear(year))
+		return 29;
+	return days[month - 1];
+}
+
+//4で割り切れる年は、原則としてうるう年
+//ただし、100で割り切れて400で割り切れない年は、うるう年ではなく平年（365日）（例：2100年など）。
+//400で割り切れる年は、100で割り切れても、うるう年（例：2000年など）。
+static bool isLeapYear(int year) {
+	if (year % 400 == 0)
+		return true;
+	if (year % 100 == 0)
+		return false;
+	if (year % 4 == 0)
+		return true;
+	return false;
+}
+
 static ValueError parseValue(const std::string& s, double& out) {
 	if (s.empty())
 		return VALUE_BAD_FORMAT;
@@ -156,35 +205,6 @@ static ValueError parseValue(const std::string& s, double& out) {
 	return VALUE_OK;
 }
 
-void BitcoinExchange::loadDatabase(const std::string& path) {
-	std::ifstream ifs(path.c_str());
-	if (!ifs)
-		throw FileOpenException();
-	std::string line;
-	while (std::getline(ifs, line)) {
-		std::string trimmed = trim(line);
-		if (trimmed.empty() || trimmed == "date,exchange_rate")
-			continue;
-		size_t pos = trimmed.find(',');
-		if (pos == std::string::npos)
-			continue;
-		std::string date = trimmed.substr(0, pos);
-		std::string rateStr = trimmed.substr(pos + 1);
-
-		if (!isValidDateFormat(date))
-			continue;
-
-		char* end;
-		double rate = std::strtod(rateStr.c_str(), &end);
-		if (end == rateStr.c_str() || *end != '\0')
-			continue;
-
-		_db[date] = rate;
-	}
-	if (_db.empty())
-		throw EmptyDatabaseException();
-}
-
 //dateで調べてrateを取ってくる。
 //ない場合はその日付以下で最も近い日付のレートを返す
 double BitcoinExchange::getRate(const std::string& date) const {
@@ -197,41 +217,19 @@ double BitcoinExchange::getRate(const std::string& date) const {
 }
 
 static std::string trim(const std::string& s) {
-	std::string::size_type first = s.find_first_not_of(" \t\n\r");
+	size_t first = s.find_first_not_of(" \t\n\r");
 	if (first == std::string::npos)
 		return "";
-	std::string::size_type last = s.find_last_not_of(" \t\n\r");
+	size_t last = s.find_last_not_of(" \t\n\r");
 	return s.substr(first, last - first + 1);
 }
 
 static bool isAllDigits(const std::string& s) {
-	for (std::string::size_type i = 0; i < s.size(); ++i) {
+	for (size_t i = 0; i < s.size(); ++i) {
 		if (!std::isdigit(static_cast<unsigned char>(s[i])))
 			return false;
 	}
 	return true;
-}
-
-static int daysInMonth(int year, int month) {
-	static const int days[12] = {31, 28, 31, 30, 31, 30,
-			31, 31, 30, 31, 30, 31};
-
-	if (month == 2 && isLeapYear(year))
-		return 29;
-	return days[month - 1];
-}
-
-//4で割り切れる年は、原則としてうるう年
-//ただし、100で割り切れて400で割り切れない年は、うるう年ではなく平年（365日）（例：2100年など）。
-//400で割り切れる年は、100で割り切れても、うるう年（例：2000年など）。
-static bool isLeapYear(int year) {
-	if (year % 400 == 0)
-		return true;
-	if (year % 100 == 0)
-		return false;
-	if (year % 4 == 0)
-		return true;
-	return false;
 }
 
 const char* BitcoinExchange::FileOpenException::what() const throw() {
