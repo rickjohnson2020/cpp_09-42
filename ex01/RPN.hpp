@@ -18,9 +18,6 @@ public:
 	RPN& operator=(const RPN& other);
 
 	int calculate(const std::string& expr);
-	void getTop();
-
 };
-
 
 #endif
