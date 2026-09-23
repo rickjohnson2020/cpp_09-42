@@ -11,7 +11,7 @@ private:
 	std::map<std::string, double> _db;
 
 	void processLine(const std::string& line) const;
-	double getRate(const std::string& date) const;
+	bool getRate(const std::string& date, double& out) const;
 
 public:
 	BitcoinExchange();
@@ -28,11 +28,6 @@ public:
 	};
 
 	class EmptyDatabaseException : public std::exception {
-	public:
-		virtual const char* what() const throw();
-	};
-
-	class DateOutOfRangeException : public std::exception {
 	public:
 		virtual const char* what() const throw();
 	};

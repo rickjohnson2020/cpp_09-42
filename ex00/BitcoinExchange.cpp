@@ -112,12 +112,12 @@ void BitcoinExchange::processLine(const std::string& line) const {
 		return;
 	}
 	
-	try {
-		double rate = getRate(date);
-		std::cout << date << " => " << value << " = " << value * rate << std::endl;
-	} catch (const DateOutOfRangeException& e) {
-		std::cout << e.what() << std::endl;
+	double rate;
+	if (!getRate(date, rate)) {
+		std::cout << "Error: bad input => " << date << std::endl;
+		return;
 	}
+	std::cout << date << " => " << value << " = " << value * rate << std::endl;
 }
 
 static bool isValidDate(const std::string& s) {
@@ -205,15 +205,14 @@ static ValueError parseValue(const std::string& s, double& out) {
 	return VALUE_OK;
 }
 
-//dateで調べてrateを取ってくる。
-//ない場合はその日付以下で最も近い日付のレートを返す
-double BitcoinExchange::getRate(const std::string& date) const {
+bool BitcoinExchange::getRate(const std::string& date, double& out) const {
 	//指定キーより大きい最初の要素を取って1つ戻す
 	std::map<std::string, double>::const_iterator it = _db.upper_bound(date);
 	if (it == _db.begin())
-		throw DateOutOfRangeException();
+		return false;
 	--it;
-	return it->second;
+	out = it->second;
+	return true;
 }
 
 static std::string trim(const std::string& s) {
@@ -238,8 +237,4 @@ const char* BitcoinExchange::FileOpenException::what() const throw() {
 
 const char* BitcoinExchange::EmptyDatabaseException::what() const throw() {
 	return "Error: database is empty.";
-}
-
-const char* BitcoinExchange::DateOutOfRangeException::what() const throw() {
-	return "Error: date is before the database range.";
 }
