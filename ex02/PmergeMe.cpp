@@ -82,8 +82,8 @@ std::vector<int> PmergeMe::fordJohnsonVec(const std::vector<int>& input) {
 	if (input.size() <= 1)
 		return input;
 
-	bool hasStraggler;
-	int straggler;
+	bool hasStraggler = false;
+	int straggler = 0;
 	std::vector<Pair> pairs = makeVecPairs(input, hasStraggler, straggler);
 
 	//highだけ取り出して再帰でソートする
@@ -212,8 +212,8 @@ std::deque<int> PmergeMe::fordJohnsonDeq(const std::deque<int>& input) {
 	if (input.size() <= 1)
 		return input;
 
-	bool hasStraggler;
-	int straggler;
+	bool hasStraggler = false;
+	int straggler = 0;
 	std::deque<Pair> pairs = makeDeqPairs(input, hasStraggler, straggler);
 
 	//highだけ取り出して再帰でソートする
