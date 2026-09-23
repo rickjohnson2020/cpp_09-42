@@ -23,7 +23,7 @@ private:
 	double _vecTime;
 
 	void binaryInsertVec(std::vector<int>& chain, const Pending& p);
-	std::vector<int> fordJohnsonVector(const std::vector<int>& input);
+	std::vector<int> fordJohnsonVec(const std::vector<int>& input);
 	std::vector<Pair> makeVecPairs(const std::vector<int>& input,
 		bool& hasStraggler, int& straggler);
 	bool containsDuplicate(int value) const;

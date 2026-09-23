@@ -34,7 +34,7 @@ void PmergeMe::parse(int ac, char** av) {
 
 void PmergeMe::sortVector() {
 	clock_t start = clock();
-	_vec = fordJohnsonVector(_vec);
+	_vec = fordJohnsonVec(_vec);
 	clock_t end = clock();
 	_vecTime = (static_cast<double>(end - start) / CLOCKS_PER_SEC) * 1000000.0;
 }
@@ -71,15 +71,14 @@ void PmergeMe::printTimes() const {
 }
 
 bool PmergeMe::containsDuplicate(int value) const {
-	for (std::vector<int>::const_iterator it = _vec.begin();
-			it != _vec.end(); ++it) {
-		if (*it == value)
+	for (size_t i = 0; i < _vec.size(); ++i) {
+		if (_vec[i] == value)
 			return true;
 	}
 	return false;
 }
 
-std::vector<int> PmergeMe::fordJohnsonVector(const std::vector<int>& input) {
+std::vector<int> PmergeMe::fordJohnsonVec(const std::vector<int>& input) {
 	if (input.size() <= 1)
 		return input;
 
@@ -89,10 +88,10 @@ std::vector<int> PmergeMe::fordJohnsonVector(const std::vector<int>& input) {
 
 	//highだけ取り出して再帰でソートする
 	std::vector<int> highs;
-	for (size_t i = 0; i < pairs.size(); ++i) {
+	for (size_t i = 0; i < pairs.size(); ++i)
 		highs.push_back(pairs[i].high);
-	}
-	std::vector<int> sortedHighs = fordJohnsonVector(highs);
+	
+	std::vector<int> sortedHighs = fordJohnsonVec(highs);
 
 	//sortedHighsの順番にpairを並べ直す。
 	std::vector<Pair> reorderedPairs;
