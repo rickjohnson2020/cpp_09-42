@@ -12,7 +12,7 @@
 PmergeMe::PmergeMe() : _vecTime(0.0), _deqTime(0.0) {}
 
 PmergeMe::PmergeMe(const PmergeMe& other) : _vec(other._vec),
-		_deq(other._deq), _vecTime(other._vecTime), _deqTime(other._deqTime) {}
+		_vecTime(other._vecTime), _deq(other._deq), _deqTime(other._deqTime) {}
 
 PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
 	if (this != &other) {
