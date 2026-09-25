@@ -3,7 +3,7 @@ NAME = PmergeMe
 BUILD_DIR = build
 
 CC = c++
-CFLAGS = -std=c++98 -Wall -Wextra -Werror
+CFLAGS = -std=c++98 -Wall -Wextra -Werror -O2
 
 SRCS = main.cpp PmergeMe.cpp
 OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRCS:.cpp=.o)))

@@ -38,6 +38,11 @@ private:
 	void binaryInsertDeq(std::deque<int>& chain, const Pending& p);
 
 public:
+	PmergeMe();
+	PmergeMe(const PmergeMe& other);
+	PmergeMe& operator=(const PmergeMe& other);
+	~PmergeMe();
+	
 	void parse(int ac, char** av);
 	void sortVector();
 	void sortDeque();

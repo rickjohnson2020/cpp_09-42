@@ -9,6 +9,23 @@
 #include <climits>
 #include <vector>
 
+PmergeMe::PmergeMe() : _vecTime(0.0), _deqTime(0.0) {}
+
+PmergeMe::PmergeMe(const PmergeMe& other) : _vec(other._vec),
+		_deq(other._deq), _vecTime(other._vecTime), _deqTime(other._deqTime) {}
+
+PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
+	if (this != &other) {
+		_vec = other._vec;
+		_deq = other._deq;
+		_vecTime = other._vecTime;
+		_deqTime = other._deqTime;
+	}
+	return *this;
+}
+
+PmergeMe::~PmergeMe() {}
+
 void PmergeMe::parse(int ac, char** av) {
 	if (ac < 2)
 		throw std::runtime_error("Error");
