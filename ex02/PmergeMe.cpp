@@ -10,9 +10,9 @@
 #include <vector>
 
 PmergeMe::PmergeMe() : _vecTime(0.0), _deqTime(0.0) {}
-
+PmergeMe::~PmergeMe() {}
 PmergeMe::PmergeMe(const PmergeMe& other) : _vec(other._vec),
-		_vecTime(other._vecTime), _deq(other._deq), _deqTime(other._deqTime) {}
+		_deq(other._deq), _vecTime(other._vecTime), _deqTime(other._deqTime) {}
 
 PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
 	if (this != &other) {
@@ -23,8 +23,6 @@ PmergeMe& PmergeMe::operator=(const PmergeMe& other) {
 	}
 	return *this;
 }
-
-PmergeMe::~PmergeMe() {}
 
 void PmergeMe::parse(int ac, char** av) {
 	if (ac < 2)
@@ -144,13 +142,12 @@ std::vector<int> PmergeMe::fordJohnsonVec(const std::vector<int>& input) {
 
 	//Jacobsthal順を生成
 	//pendingにはa1が含まれていないのでpending.size()+1 (a1はmain chainに最初から入っている。)
-	std::vector<size_t> order = makeJacobsthalOrder(pending.size() + 1);
+	std::vector<size_t> order = makeJacobsthalOrderVec(pending.size() + 1);
 	for (size_t i = 0; i < order.size(); ++i) {
 		size_t aIndex = order[i];
 		size_t pendingIndex = aIndex - 2;
 		Pending& p = pending[pendingIndex];
 
-		//p.valueをmainChainにbinary insertionで入れていく
 		binaryInsertVec(mainChain, p);
 	}
 	return mainChain;
@@ -179,7 +176,7 @@ std::vector<PmergeMe::Pair> PmergeMe::makeVecPairs(const std::vector<int>& input
 	return pairs;
 }
 
-std::vector<size_t> PmergeMe::makeJacobsthalOrder(size_t maxIndex) {
+std::vector<size_t> PmergeMe::makeJacobsthalOrderVec(size_t maxIndex) {
 	std::vector<size_t> order;
 
 	if (maxIndex < 2)
@@ -272,7 +269,7 @@ std::deque<int> PmergeMe::fordJohnsonDeq(const std::deque<int>& input) {
 	}
 
 	//insert pending into mainChain using binary insertion
-	std::vector<size_t> insertionOrder = makeJacobsthalOrder(pending.size() + 1);
+	std::deque<size_t> insertionOrder = makeJacobsthalOrderDeq(pending.size() + 1);
 	for (size_t i = 0; i < insertionOrder.size(); ++i) {
 		size_t aIndex = insertionOrder[i];
 		size_t pIndex = aIndex - 2;
@@ -303,6 +300,34 @@ std::deque<PmergeMe::Pair> PmergeMe::makeDeqPairs(const std::deque<int>& input,
 		straggler = input.back();
 	}
 	return pairs;
+}
+
+std::deque<size_t> PmergeMe::makeJacobsthalOrderDeq(size_t maxIndex) {
+	std::deque<size_t> order;
+
+	if (maxIndex < 2)
+		return order;
+
+	size_t prev = 1;
+	size_t curr = 3;
+	while (prev < maxIndex) {
+		size_t high;
+		if (curr < maxIndex)
+			high = curr;
+		else
+			high = maxIndex;
+
+		for (size_t i = high; i > prev; --i) {
+			order.push_back(i);
+		}
+		if (curr >= maxIndex)
+			break;
+
+		size_t next = curr + 2 * prev;
+		prev = curr;
+		curr = next;
+	}
+	return order;
 }
 
 void PmergeMe::binaryInsertDeq(std::deque<int>& chain, const Pending& p) {
