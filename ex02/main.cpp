@@ -14,6 +14,7 @@ int main(int argc, char** argv) {
 		p.printTimes();
 	} catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
+		return 1;
 	}
 	return 0;
 }

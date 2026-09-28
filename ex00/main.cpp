@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
 		btc.processInput(argv[1]);
 	} catch (const std::exception& e) {
 		std::cout << e.what() << std::endl;
+		return 1;
 	}
 	return 0;
 }
